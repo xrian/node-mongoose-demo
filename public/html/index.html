@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>主页</title>
+	<link rel="stylesheet" href="/public/plugin/bootstrap3.3.5/css/bootstrap.min.css"/>
+	<style>
+	.wrapper{
+		margin: 30px;
+	}
+	.add.row{
+		margin-bottom: 30px;
+	}
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<div class="row add">
+		<div class="col-xs-12">
+			<a class="btn btn-primary btn-xs" href="/public/html/editor.html" target="_blank">新增</a>
+		</div>
+	</div>
+	<div class="table table-responsive">
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>用户名</th>
+					<th>昵称</th>
+					<th>手机号</th>
+					<th>年龄</th>
+					<th>性别</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="tbody">
+
+			</tbody>
+		</table>
+	</div>
+</div>
+<script src="/public/javascripts/jquery-1.11.0.min.js"></script>
+<script src="/public/plugin/bootstrap3.3.5/js/bootstrap.min.js"></script>
+<script src="/public/plugin/layer/layer.js"></script>
+<script>
+$(function () {
+	getData();
+	$('#tbody').on('click', '.remove', function (e) {
+		e.preventDefault();
+		var id = $(this).attr('data-id');
+		layer.confirm('您确定要删除吗?', ['确定','取消'], function () {
+			$.ajax({
+				url: '/users/'+id,
+				type: 'DELETE',
+				success: function(result) {
+					if(result.status===1){
+						var indexs = layer.alert('删除成功', function () {
+							$('#tbody').html('');
+							getData();
+							layer.close(indexs)
+						});
+					}else{
+						layer.alert(result.msg);
+					}
+				}
+			});
+		}, function () {
+			
+		})
+
+	})
+	function getData() {
+		$.get('/users', {}, function (result) {
+			if(result.status===1){
+				result.data.forEach(function (item, index, array) {
+					var sex = '未知';
+					if(item.sex===1){
+						sex = '男';
+					}else if(item.sex===2){
+						sex = '女';
+					}
+					$('#tbody').append('<tr><td>'+item.username+'</td><td>'+item.nickname+'</td><td>'+item.mobile+'</td><td>'+item.age+'</td><td>'+sex+'</td><td><div class="btn-group btn-group-xs" role="group" aria-label="Small button group"><a type="button" class="btn btn-info info" href="/public/html/info.html#'+item.username+'" target="_blank">查看</a><a type="button" class="btn btn-warning update" href="/public/html/editor.html#'+item.username+'" target="_blank">修改</a><button type="button" class="btn btn-danger remove" data-id="'+item._id+'">删除</button></div></td></tr>');
+				})
+			}else{
+				layer.alert(result.msg);
+			}
+		})
+	}
+})
+</script>
+</body>
+</html>

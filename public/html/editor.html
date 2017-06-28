@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>编辑</title>
+	<link rel="stylesheet" href="/public/plugin/bootstrap3.3.5/css/bootstrap.min.css"/>
+	<style>
+		.wrapper {
+			margin-top: 30px;
+		}
+	</style>
+</head>
+<body>
+
+<div class="wrapper">
+	<form id="forms" class="form-horizontal">
+		<div class="form-group">
+			<label for="username" class="col-xs-2 control-label">用户名</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" maxlength="20">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="nickname" class="col-xs-2 control-label">昵称</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="nickname" name="nickname" placeholder="请输入昵称" maxlength="20">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="mobile" class="col-xs-2 control-label">手机号</label>
+			<div class="col-xs-5">
+				<input type="tel" class="form-control" id="mobile" name="mobile" placeholder="请输入昵称" maxlength="11">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="age" class="col-xs-2 control-label">年龄</label>
+			<div class="col-xs-1">
+				<select class="form-control" id="age" name="age"></select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-xs-2 control-label">性别</label>
+			<div class="col-xs-5">
+				<label class="radio-inline">
+					<input type="radio" name="sex" class="sex" value="0" checked>未知
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="sex" class="sex" value="1">男
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="sex" class="sex" value="2">女
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-xs-5">
+				<button type="button" class="btn btn-success submit">保存</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script src="/public/javascripts/jquery-1.11.0.min.js"></script>
+<script src="/public/plugin/bootstrap3.3.5/js/bootstrap.min.js"></script>
+<script src="/public/plugin/layer/layer.js"></script>
+<script>
+	var id = null;
+	$(function () {
+		for ( var i = 0; i < 120; i++ ) {
+			$('#age').append('<option value="' + i + '">' + i + '</option>');
+		}
+		init();
+		$('.submit').on('click', function (e) {
+			e.preventDefault();
+			debugger;
+			var url = null, type = null;
+			if (id) {
+				url = '/users/' + id;
+				type = 'put';
+			} else {
+				url = '/users';
+				type = 'post';
+			}
+			$.ajax({
+				url: url,
+				type: type,
+				data: $('#forms').serialize(),
+				dataType: 'json',
+				success: function (result) {
+					if (result.status === 1) {
+						layer.alert('保存成功', function () {
+							window.location.href = '/public/html/index.html';
+						});
+					} else {
+						layer.alert(result.msg);
+					}
+				}
+			})
+		})
+
+	})
+	function init() {
+		var username = location.hash;
+		if (username) {
+			username = username.substring(1);
+			id = username;
+			$('#username').val(username);
+			$('#username').prop('disabled', true);
+			$.get('/users/' + username, {}, function (result) {
+				if (result.status === 1) {
+					$('#nickname').val(result.data.nickname);
+					$('#mobile').val(result.data.mobile);
+					$('#age').val(result.data.age);
+					$('input[value="' + result.data.sex + '"].sex').prop('checked', true);
+				} else {
+					layer.alert(result.msg);
+				}
+			})
+		}
+	}
+</script>
+</body>
+</html>

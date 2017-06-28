@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>详情</title>
+	<link rel="stylesheet" href="/public/plugin/bootstrap3.3.5/css/bootstrap.min.css"/>
+	<style>
+		.show-grid{
+			margin-bottom: 15px;
+		}
+		.left{
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<div class="row show-grid">
+		<div class="col-xs-3 left">用户名</div>
+		<div class="col-xs-7 username"></div>
+	</div>
+	<div class="row show-grid">
+		<div class="col-xs-3 left">昵称</div>
+		<div class="col-xs-7 nickname"></div>
+	</div>
+	<div class="row show-grid">
+		<div class="col-xs-3 left">手机号</div>
+		<div class="col-xs-7 mobile"></div>
+	</div>
+	<div class="row show-grid">
+		<div class="col-xs-3 left">年龄</div>
+		<div class="col-xs-7 age"></div>
+	</div>
+	<div class="row show-grid">
+		<div class="col-xs-3 left">性别</div>
+		<div class="col-xs-7 sex"></div>
+	</div>
+	<div class="row show-grid">
+		<div class="col-sm-offset-3 col-xs-3"><button type="button" class="btn btn-primary btn-xs closes">关闭</button></div>
+	</div>
+</div>
+<script src="/public/javascripts/jquery-1.11.0.min.js"></script>
+<script src="/public/plugin/bootstrap3.3.5/js/bootstrap.min.js"></script>
+<script src="/public/plugin/layer/layer.js"></script>
+<script>
+	$(function () {
+		var username = location.hash;
+		username = username.substring(1);
+		$.get('/users/'+username, {}, function (result) {
+			if(result.status===1){
+				$('.username').html(result.data.username);
+				$('.nickname').html(result.data.nickname);
+				$('.mobile').html(result.data.mobile);
+				$('.age').html(result.data.age);
+				var sex = '未知';
+				if(result.data.sex===1){
+					sex = '男';
+				}else if(result.data.sex===2){
+					sex = '女';
+				}
+				$('.sex').html(sex);
+			}else{
+				layer.alert(result.msg);
+			}
+		})
+		$('.closes').on('click', function (e) {
+			e.preventDefault();
+			window.close();
+		})
+	})
+</script>
+</body>
+</html>
